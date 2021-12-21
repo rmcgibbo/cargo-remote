@@ -1,0 +1,43 @@
+cargo-features = ["strip"]
+
+[package]
+default-run = "cargo-remote"
+edition = "2018"
+name = "cargo-remote"
+version = "0.1.0"
+
+[profile.release]
+strip = true  # Automatically strip symbols from the binary.
+opt-level = "z"  # Optimize for size.
+lto = true
+
+[dependencies]
+advisory-lock = "*"
+anyhow = "*"
+bincode = "*"
+walkdir = "2"
+futures = "*"
+gethostname = "*"
+http = "*"
+hyperlocal = "*"
+multipart-stream = "*"
+serde_json = "*"
+structopt = "*"
+tracing = "*"
+tracing-subscriber = {version = "0.3.5", features = ["env-filter"]}
+
+[dependencies.hyper]
+features = ["server", "stream", "tcp", "http1"]
+version = "*"
+
+[dependencies.serde]
+features = ["derive"]
+version = "*"
+
+[dependencies.tokio]
+features = ["full", "tracing"]
+version = "1.15.0"
+
+[dependencies.tokio-util]
+features = ["codec"]
+version = "*"
