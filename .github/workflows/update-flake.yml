@@ -17,8 +17,8 @@ jobs:
       - uses: cachix/install-nix-action@v16
       - name: Make changes to pull request
         run: |
-	    nix flake update
-	    nix develop -c cargo update
+          nix flake update
+          nix develop -c cargo update
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v3
