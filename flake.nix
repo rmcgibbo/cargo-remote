@@ -62,9 +62,9 @@
           src = ./.;
           nativeBuildInputs = with pkgs; [ pkgsStatic.stdenv.cc lld_13 ];
           buildInputs = with pkgs; [
-              openssh
-              rsync
-              git
+            openssh
+            rsync
+            git
           ];
           preBuild = ''
             export CARGO_REMOTE_SSH=$(command -v ssh)
@@ -74,20 +74,28 @@
           doCheck = true;
         };
 
+
+        checks = {
+          cargo-check = naerskBuildPackage "x86_64-unknown-linux-musl" {
+            src = ./.;
+            cargoBuild = x: ''cargo $cargo_options check $cargo_build_options >> $cargo_build_output_json'';
+          };
+        };
+
         devShell = pkgs.mkShell (rec {
-            name = "cargo-remote";
-            shellHook = ''
-              export PS1="\n(${name}) \[\033[1;32m\][\[\e]0;\u@\h: \w\a\]\u@\h:\w]\[\033[0m\]\n$ "
-              ${packages.x86_64-unknown-linux-musl.preBuild}
-            '';
-            inputsFrom = [ packages.x86_64-unknown-linux-musl ];
-            buildInputs = with pkgs; [
-              openssh
-              rsync
-              git
-            ];
-            CARGO_BUILD_TARGET = "x86_64-unknown-linux-musl";
-          } // cargoConfig
+          name = "cargo-remote";
+          shellHook = ''
+            export PS1="\n(${name}) \[\033[1;32m\][\[\e]0;\u@\h: \w\a\]\u@\h:\w]\[\033[0m\]\n$ "
+            ${packages.x86_64-unknown-linux-musl.preBuild}
+          '';
+          inputsFrom = [ packages.x86_64-unknown-linux-musl ];
+          buildInputs = with pkgs; [
+            openssh
+            rsync
+            git
+          ];
+          CARGO_BUILD_TARGET = "x86_64-unknown-linux-musl";
+        } // cargoConfig
         );
       }
     );

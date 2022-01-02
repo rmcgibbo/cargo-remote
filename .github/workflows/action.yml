@@ -19,3 +19,4 @@ jobs:
     - name: Build
       run: |
         nix build --print-build-logs
+        nix flake check
