@@ -7,7 +7,6 @@ name = "cargo-remote"
 version = "0.1.0"
 
 [profile.release]
-strip = true  # Automatically strip symbols from the binary.
 opt-level = "z"  # Optimize for size.
 lto = true
 

@@ -1,33 +1,29 @@
 {
   inputs = {
     nixpkgs.url = github:NixOS/nixpkgs/nixpkgs-unstable;
-    naersk = {
-      url = github:nix-community/naersk;
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    fenix = {
-      url = github:nix-community/fenix;
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    flake-utils.url = github:numtide/flake-utils;
+    utils.url = "github:numtide/flake-utils";
+    naersk.url = "github:nix-community/naersk";
+    naersk.inputs.nixpkgs.follows = "nixpkgs";
+    rust-overlay.url = "github:oxalica/rust-overlay";
+    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    rust-overlay.inputs.flake-utils.follows = "utils";
   };
 
-  outputs = { self, nixpkgs, naersk, fenix, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (
+  outputs = { self, nixpkgs, naersk, rust-overlay, utils }:
+    utils.lib.eachDefaultSystem (
       system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
-        toolchain = with fenix.packages.${system};
-          combine [
-            minimal.rustc
-            minimal.cargo
-            targets.x86_64-unknown-linux-musl.latest.rust-std
-          ];
-
-        # Make naersk aware of the tool chain which is to be used.
-        naersk-lib = naersk.lib.${system}.override {
-          cargo = toolchain;
-          rustc = toolchain;
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ (import rust-overlay) ];
+        };
+        rust = pkgs.rust-bin.stable.latest.default.override {
+          extensions = [ "rust-src" ];
+          targets = [ "x86_64-unknown-linux-musl" ];
+        };
+        naersk-lib = naersk.lib."${system}".override {
+          rustc = rust;
+          cargo = rust;
         };
         # Utility for merging the common cargo configuration with the target
         # specific configuration.
